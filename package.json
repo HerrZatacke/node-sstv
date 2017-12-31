@@ -1,17 +1,19 @@
 {
-	"name": "sstv",
-	"author" : {
-		"name" : "echicken",
-		"email" : "echicken@bbs.electronicchicken.com"
-	},
-	"description" : "A Slow-Scan Television (SSTV) module for node.js",
-	"main" : "index.js",
-	"engines" : {
-		"node" : ">=0.10"
-	},
-	"dependencies": {
-		"jimp" : "0.2.x"
-	},
-	"keywords" : [ "sstv" ],
-	"version" : "0.1.0"
+  "name": "sstv",
+  "author": {
+    "name": "echicken",
+    "email": "echicken@bbs.electronicchicken.com"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "description": "A Slow-Scan Television (SSTV) module for node.js",
+  "main": "lib/index.js",
+  "keywords": [
+    "sstv"
+  ],
+  "version": "0.1.0",
+  "dependencies": {
+    "get-pixels": "^3.3.0"
+  }
 }

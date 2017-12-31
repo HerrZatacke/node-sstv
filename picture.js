@@ -1,102 +1,81 @@
-var util = require('util'),
-	EventEmitter = require('events'),
-	Jimp = require('jimp');
+const getPixels = require('get-pixels');
+const rgb2yuv = require('./helpers/rgb2yuv');
+const af = require('./helpers/af');
 
-var Picture = function (data) {
+class Picture {
 
-	EventEmitter.call(this);
+  constructor() {
+    this.imageData = null;
+    this.imageDimensions = null;
+  }
 
-	var self = this, image = { bitmap : { data : [], width : 0, height : 0 }};
+  pixel2af(x, y, mode) {
+    const rgb = {
+      r: af(this.imageData.get(x, y, 0)),
+      g: af(this.imageData.get(x, y, 1)),
+      b: af(this.imageData.get(x, y, 2)),
+    };
 
-	function toAF(n) {
-		return 1500 + Math.min(255, Math.max(0, n)) * 3.1372549;
-	}
+    switch (mode) {
+      case 'rgb':
+      return rgb;
+      case 'yuv':
+        const yuv = rgb2yuv(rgb);
+        return {
+          y: af(yuv.y),
+          u: af(yuv.u),
+          v: af(yuv.v),
+        };
+      default:
+        return null;
+    }
+  }
 
-	function RGBtoYUV(r, g, b) {
-		return {
-			y : 16+(.003906*((65.738*r)+(129.057*g)+(25.064*b))),
-			u : 128+(.003906*((112.439*r)+(-94.154*g)+(-18.285*b))),
-			v : 128+(.003906*((-37.945*r)+(-74.494*g)+(112.439*b)))
-		}
-	}
+  line2af(y, mode) {
+    const line = [];
+    for (let x = 0; x < this.imageDimensions.width; x++) {
+      line[x] = this.pixel2af(x, y, mode);
+    }
+    return line;
+  }
 
-	function pixelToYuvAf(index) {
-		var yuv = RGBtoYUV(
-			image.bitmap.data[index],
-			image.bitmap.data[index + 1],
-			image.bitmap.data[index + 2]
-		);
-		return { y : toAF(yuv.y), u : toAF(yuv.u), v : toAF(yuv.v) };
-	}
+  image2af(mode) {
+    const lines = [];
+    for (let y = 0; y < this.imageDimensions.height; y++) {
+      lines[y] = this.line2af(y, mode);
+    }
+    return lines;
+  }
 
-	function pixelToRgbAf(index) {
-		return {
-			r : toAF(image.bitmap.data[index]),
-			g : toAF(image.bitmap.data[index + 1]),
-			b : toAF(image.bitmap.data[index + 2])
-		};
-	}
+  get YUV_AF() {
+    return this.image2af('yuv');
+  }
+  get RGB_AF() {
+    return this.image2af('rgb');
+  };
+  get width() {
+    return this.imageDimensions.width;
+  };
+  get height() {
+    return this.imageDimensions.height;
+  };
 
-	function lineToYuvAf(y) {
-		var line = [];
-		for (var x = 0; x < image.bitmap.width; x++) {
-			line[x] = pixelToYuvAf(((image.bitmap.width * y + x)<<2));
-		}
-		return line;
-	}
-
-	function imageToYuvAf() {
-		var lines = [];
-		for (var y = 0; y < image.bitmap.height; y++) {
-			lines[y] = lineToYuvAf(y);
-		}
-		return lines;
-	}
-
-	function lineToRgbAf(y) {
-		var line = [];
-		for (var x = 0; x < image.bitmap.width; x++) {
-			line[x] = pixelToRgbAf(((image.bitmap.width * y + x)<<2));
-		}
-		return line;
-	}
-
-	function imageToRgbAf() {
-		var lines = [];
-		for (var y = 0; y < image.bitmap.height; y++) {
-			lines[y] = lineToRgbAf(y);
-		}
-		return lines;
-	}
-
-	this.__defineGetter__('YUV_AF', function () { return imageToYuvAf(); });
-	this.__defineGetter__('RGB_AF', function () { return imageToRgbAf(); });
-	this.__defineGetter__('data', function () { return image.bitmap.data; });
-	this.__defineGetter__('width', function () { return image.bitmap.width; });
-	this.__defineGetter__('height',	function () {return image.bitmap.height;});
-
-	this.load = function (buf) {
-		Jimp.read(
-			buf,
-			function (err, img) {
-				if (err !== null) {
-					self.emit('error', err);
-				} else {
-					image = img;
-					self.emit('ready')
-				}				
-			}
-		);
-	}
-
-	this.scale = function (height, callback) {
-		image.resize(Jimp.AUTO, height);
-		callback.call(this);
-	}
-
-	if (data instanceof Buffer) this.load(data);
-
+  load(filename) {
+    return new Promise((resolve, reject) => {
+      getPixels(filename, (err, imageData) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        this.imageData = imageData;
+        this.imageDimensions = {
+          width: imageData.shape[0],
+          height: imageData.shape[1],
+        };
+        resolve(this);
+      })
+    });
+  };
 }
-util.inherits(Picture, EventEmitter);
 
 module.exports = Picture;
