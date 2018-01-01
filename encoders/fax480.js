@@ -1,39 +1,38 @@
-const fax480 = function (picture) {
-
-  var self = this;
-  var samples = this.sampleRate * (262.144 * .001);
-  var scale = 512 / samples;
+const fax480 = function (picture, encoder) {
+  const samples = encoder.sampleRate * (262.144 * .001);
+  const scale = 512 / samples;
 
   function header() {
-    self._tone(2300, 2.05);
-    self._tone(1500, 2.05);
+    encoder._tone(2300, 2.05);
+    encoder._tone(1500, 2.05);
   }
 
   function phasingInterval() {
-    self._tone(1200, 5.12);
-    self._tone(2300, 262.144);
+    encoder._tone(1200, 5.12);
+    encoder._tone(2300, 262.144);
   }
 
   function scan(line) {
-    self._tone(1200, 5.12);
-    for (var s = 0; s < samples; s++) {
-      self._addSample(line[Math.floor(s * scale)].y, s);
+    encoder._tone(1200, 5.12);
+    let sample;
+    for (let s = 0; s < samples; s++) {
+      try {
+        sample = line[Math.floor(s * scale)].y
+      } catch (err) {
+        /* no op */
+      }
+      encoder._addSample(sample, s);
     }
   }
 
-  function encode() {
-    for (var n = 0; n < 1220; n++) {
-      header();
-    }
-    for (var n = 0; n < 20; n++) {
-      phasingInterval();
-    }
-    picture.YUV_AF.forEach(scan);
-    var data = self._finish();
+  for (let n = 0; n < 1220; n++) {
+    header();
   }
-
-  picture.scale(480, encode);
-
+  for (let n = 0; n < 20; n++) {
+    phasingInterval();
+  }
+  picture.YUV_AF.forEach(scan);
+  return encoder._finish();
 };
 
 module.exports = fax480;
