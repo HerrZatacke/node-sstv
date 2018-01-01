@@ -1,6 +1,7 @@
-const martin = function (variant, picture) {
+const martin = function (variant, picture, encoder) {
 
-  var self = this, scanTime, visCode;
+  let scanTime;
+  let visCode;
 
   switch (variant) {
     case 0: // M1
@@ -15,19 +16,25 @@ const martin = function (variant, picture) {
       break;
   }
 
-  var samples = this.sampleRate * (scanTime * .001);
-  var scale = 320 / samples;
+  const samples = encoder.sampleRate * (scanTime * .001);
+  const scale = 320 / samples;
 
   function sync() {
-    self._tone(1200, 4.862);
-    self._tone(1500, 0.572);
+    encoder._tone(1200, 4.862);
+    encoder._tone(1500, 0.572);
   }
 
   function scan(line, colour) {
-    for (var s = 0; s < samples; s++) {
-      self._addSample(line[Math.floor(s * scale)][colour], s);
+    let sample;
+    for (let s = 0; s < samples; s++) {
+      try {
+        sample = line[Math.floor(s * scale)][colour];
+      } catch (er) {
+        /* no opp */
+      }
+      encoder._addSample(sample, s);
     }
-    self._tone(1500, 0.572); // Separator
+    encoder._tone(1500, 0.572); // Separator
   }
 
   function cycle(line) {
@@ -37,14 +44,9 @@ const martin = function (variant, picture) {
     scan(line, 'r');
   }
 
-  function encode() {
-    self._start(visCode);
-    picture.RGB_AF.forEach(cycle);
-    var data = self._finish();
-  }
-
-  picture.scale(256, encode);
-
-}
+  encoder._start(visCode);
+  picture.RGB_AF.forEach(cycle);
+  return encoder._finish();
+};
 
 module.exports = martin;

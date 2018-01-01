@@ -32,18 +32,11 @@ const scottie = function (variant, picture, encoder) {
     encoder._tone(1500, 1.5);
   }
 
-  const sampleRange = {
-    min: 9000,
-    max: 0,
-  };
-
   function scan(line, colour) {
     let sample;
     for (let s = 0; s < samples; s++) {
       try {
         sample = line[Math.floor(s * scale)][colour];
-        // sampleRange.min = Math.min(sampleRange.min, sample);
-        // sampleRange.max = Math.max(sampleRange.max, sample);
       } catch (er) {
         /* no op */
       }
@@ -62,7 +55,6 @@ const scottie = function (variant, picture, encoder) {
 
   encoder._start(visCode);
   picture.RGB_AF.forEach(cycle);
-  console.log(sampleRange);
   return encoder._finish();
 
 };
