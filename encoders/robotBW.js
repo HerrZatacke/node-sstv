@@ -1,20 +1,17 @@
 const robotBW = function (variant, picture, encoder) {
   let syncTime;
   let yScanTime;
-  let width;
   let visCode;
 
   switch (variant) {
     case 0: // 8
       syncTime = 10;
       yScanTime = 56;
-      width = 160;
       visCode = 2;
       break;
     case 1: // 12
       syncTime = 7;
       yScanTime = 93;
-      width = 160;
       visCode = 6;
       break;
     default:
@@ -22,7 +19,7 @@ const robotBW = function (variant, picture, encoder) {
   }
 
   const samples = encoder.sampleRate * (yScanTime * .001);
-  const scale = width / samples;
+  const scale = picture.width / samples;
 
   function scan(line) {
     encoder._tone(1200, syncTime);

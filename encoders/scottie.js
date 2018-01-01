@@ -21,7 +21,7 @@ const scottie = function (variant, picture, encoder) {
   }
 
   const samples = encoder.sampleRate * (scanTime * .001);
-  const scale = 320 / samples;
+  const scale = picture.width / samples;
 
   function sync() {
     encoder._tone(1200, 9);

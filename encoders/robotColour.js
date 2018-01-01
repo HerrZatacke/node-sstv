@@ -24,8 +24,8 @@ const robotColour = function (variant, picture, encoder) {
   const ySamples = encoder.sampleRate * (yScanTime * .001);
   const uvSamples = encoder.sampleRate * (uvScanTime * .001);
 
-  const yScale = 320 / ySamples;
-  const uvScale = 320 / uvSamples;
+  const yScale = picture.width / ySamples;
+  const uvScale = picture.width / uvSamples;
 
   function addSamples(line, samples, scale, yuv) {
     let sample;

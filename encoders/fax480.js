@@ -1,6 +1,6 @@
 const fax480 = function (picture, encoder) {
   const samples = encoder.sampleRate * (262.144 * .001);
-  const scale = 512 / samples;
+  const scale = picture.width / samples;
 
   function header() {
     encoder._tone(2300, 2.05);
