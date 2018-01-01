@@ -5,15 +5,18 @@ const scottie = function (variant, picture, encoder) {
 
   switch (variant) {
     case 0: // 1
-      scanTime = 138.24;
+      // scanTime = 138.24;
+      scanTime = 138.242;
       visCode = 60;
       break;
     case 1: // 2
-      scanTime = 88.064;
+      // scanTime = 88.064;
+      scanTime = 88.062;
       visCode = 56;
       break;
     case 2: // DX
-      scanTime = 345.6;
+      // scanTime = 345.6;
+      scanTime = 345.597;
       visCode = 76;
       break;
     default:
@@ -45,12 +48,12 @@ const scottie = function (variant, picture, encoder) {
   }
 
   function cycle(line) {
+    scan(line, 'r');
     separate();
     scan(line, 'g');
     separate();
     scan(line, 'b');
     sync();
-    scan(line, 'r');
   }
 
   encoder._start(visCode);
