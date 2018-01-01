@@ -1,16 +1,26 @@
-const fs = require('fs');
+const path = require('path');
+const wav = require('wav');
+const buffer2stream = require('./helpers/buffer2stream');
 const Encoder = require('./encoder');
-const { SCOTTIE_1, ROBOT_COLOR_36 } = require('./modes');
+const Modes = require('./modes');
 
 const enc = new Encoder();
 
-// enc.encode(ROBOT_COLOR_36, './beatle300x256.png')
-enc.encode(SCOTTIE_1, './beatle300x256.png')
+// const mode = 'ROBOT_COLOR_36';
+const mode = 'SCOTTIE_1';
+const inFilename = './beatle300x256.png';
+const outFilename = `./${path.basename(inFilename, path.extname(inFilename))}_${mode}.wav`;
+
+const writer = new wav.FileWriter(outFilename, {
+  format: 1,
+  channels: 1,
+  sampleRate: 44100,
+  bitDepth: 16,
+});
+
+enc.encode(Modes[mode], inFilename)
 .then((data) => {
-  fs.writeFile('./signed16_mono.wav', data, (err) => {
-    console.log(err);
-    console.log('we are here');
-  });
+  buffer2stream(data).pipe(writer);
 })
 .catch(err => {
   console.log(err);
