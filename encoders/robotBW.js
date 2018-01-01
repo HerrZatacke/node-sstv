@@ -36,7 +36,7 @@ const robotBW = function (variant, picture, encoder) {
 
 
   encoder._start(visCode);
-  picture.YUV_AF.forEach(scan);
+  picture.yuv_af(120).forEach(scan);
   return encoder._finish();
 };
 

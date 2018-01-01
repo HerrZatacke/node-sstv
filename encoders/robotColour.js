@@ -72,7 +72,7 @@ const robotColour = function (variant, picture, encoder) {
   }
 
   encoder._start(visCode);
-  picture.YUV_AF.forEach(variant === 0 ? scan36 : scan72);
+  picture.yuv_af(240).forEach(variant === 0 ? scan36 : scan72);
   return encoder._finish();
 
 };

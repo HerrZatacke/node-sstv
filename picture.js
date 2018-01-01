@@ -43,25 +43,25 @@ class Picture {
     return line;
   }
 
-  image2af(mode) {
+  image2af(lineCount, mode) {
     const lines = [];
-    for (let y = 0; y < this.imageDimensions.height; y++) {
-      lines[y] = this.line2af(y, mode);
+    for (let y = 0; y < lineCount; y++) {
+      const relativeLine = Math.floor(y * this.imageDimensions.height / lineCount);
+      lines[y] = this.line2af(relativeLine, mode);
     }
     return lines;
   }
 
-  get YUV_AF() {
-    return this.image2af('yuv');
+  yuv_af(lines) {
+    return this.image2af(lines, 'yuv');
   }
-  get RGB_AF() {
-    return this.image2af('rgb');
+
+  rgb_af(lines) {
+    return this.image2af(lines, 'rgb');
   };
+
   get width() {
     return this.imageDimensions.width;
-  };
-  get height() {
-    return this.imageDimensions.height;
   };
 
   load(filename) {

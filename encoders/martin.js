@@ -45,7 +45,7 @@ const martin = function (variant, picture, encoder) {
   }
 
   encoder._start(visCode);
-  picture.RGB_AF.forEach(cycle);
+  picture.rgb_af(256).forEach(cycle);
   return encoder._finish();
 };
 

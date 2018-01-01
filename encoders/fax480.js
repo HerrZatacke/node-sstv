@@ -31,7 +31,7 @@ const fax480 = function (picture, encoder) {
   for (let n = 0; n < 20; n++) {
     phasingInterval();
   }
-  picture.YUV_AF.forEach(scan);
+  picture.yuv_af(480).forEach(scan);
   return encoder._finish();
 };
 
