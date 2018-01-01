@@ -11,14 +11,18 @@ class Picture {
 
   pixel2af(x, y, mode) {
     const rgb = {
-      r: af(this.imageData.get(x, y, 0)),
-      g: af(this.imageData.get(x, y, 1)),
-      b: af(this.imageData.get(x, y, 2)),
+      r: this.imageData.get(x, y, 0),
+      g: this.imageData.get(x, y, 1),
+      b: this.imageData.get(x, y, 2),
     };
 
     switch (mode) {
       case 'rgb':
-      return rgb;
+      return {
+        r: af(rgb.r),
+        g: af(rgb.g),
+        b: af(rgb.b),
+      };
       case 'yuv':
         const yuv = rgb2yuv(rgb);
         return {
